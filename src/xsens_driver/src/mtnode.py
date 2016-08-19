@@ -59,11 +59,12 @@ class XSensDriver(object):
 
 		rospy.loginfo("MT node interface: %s at %d bd."%(device, baudrate))
 		self.mt = mtdevice.MTDevice(device, baudrate)
-
+		self.time = rospy.Time.now()
 		self.frame_id = get_param('~frame_id', '/mti/data')
 
 		frame_local     = get_param('~frame_local'    , 'ENU')
 		frame_local_imu = get_param('~frame_local_imu', 'ENU')
+		
 
 		if   frame_local == 'ENU':
 			R = XSensDriver.ENU
@@ -180,10 +181,18 @@ class XSensDriver(object):
 		nsecs = 0
 		
 		if time_data:
-			# first getting the sampleTimeFine
 			time = time_data['SampleTimeFine']
-			secs = 100e-6*time
-			nsecs = 1e5*time - 1e9*math.floor(secs)							
+			print time
+			#secs = math.floor(100e-6*time)
+			#nsecs = 1e5*time - 1e9*math.floor(secs)
+			secs = time / 10000
+			nsecs = (time % 10000) * 100000
+			duration = rospy.Duration(secs, nsecs)
+			h.stamp = self.time + duration
+			# first getting the sampleTimeFine
+			if h.stamp > rospy.Time.now():
+				self.time = rospy.Time.now() - duration
+				
 		
 		if acc_data:
 			if 'Delta v.x' in acc_data: # found delta-v's
@@ -304,10 +313,7 @@ class XSensDriver(object):
 		# publish available information
 		if pub_imu:
 			imu_msg.header = h
-			#all time assignments (overwriting ROS time)
 			# Comment the two lines below if you need ROS time
-			imu_msg.header.stamp.secs = secs
-			imu_msg.header.stamp.nsecs = nsecs	
 			self.imu_pub.publish(imu_msg)
 		#if pub_gps:
 		#	xgps_msg.header = gps_msg.header = h
@@ -322,43 +328,25 @@ class XSensDriver(object):
 			ss_msg.header = h
 			#all time assignments (overwriting ROS time)
 			# Comment the two lines below if you need ROS time
-			ss_msg.header.stamp.secs = secs
-			ss_msg.header.stamp.nsecs = nsecs	
 			self.ss_pub.publish(ss_msg)
 		if pub_baro:
 			baro_msg.header = h
-			#all time assignments (overwriting ROS time)
-			# Comment the two lines below if you need ROS time
-			baro_msg.header.stamp.secs = secs
-			baro_msg.header.stamp.nsecs = nsecs	
 			self.baro_pub.publish(baro_msg)
 		if pub_gnssPvt:
 			gnssPvt_msg.header = h
 			#all time assignments (overwriting ROS time)
-			# Comment the two lines below if you need ROS time
-			baro_msg.header.stamp.secs = secs
-			baro_msg.header.stamp.nsecs = nsecs	
 			self.gnssPvt_pub.publish(gnssPvt_msg)										
 		if pub_ori:
 			ori_msg.header = h
 			#all time assignments (overwriting ROS time)
-			# Comment the two lines below if you need ROS time
-			ori_msg.header.stamp.secs = secs
-			ori_msg.header.stamp.nsecs = nsecs	
 			self.ori_pub.publish(ori_msg)
 		if pub_vel:
 			vel_msg.header = h
 			#all time assignments (overwriting ROS time)
-			# Comment the two lines below if you need ROS time
-			vel_msg.header.stamp.secs = secs
-			vel_msg.header.stamp.nsecs = nsecs	
 			self.vel_pub.publish(vel_msg)
 		if pub_pos:
 			pos_msg.header = h
 			#all time assignments (overwriting ROS time)
-			# Comment the two lines below if you need ROS time
-			pos_msg.header.stamp.secs = secs
-			pos_msg.header.stamp.nsecs = nsecs	
 			self.pos_pub.publish(pos_msg)		
 			
 

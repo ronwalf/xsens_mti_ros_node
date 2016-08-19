@@ -8,6 +8,7 @@ from mtdef import MID, MTException, Baudrates, XDIGroup, getName, getMIDName, XD
 
 # Verbose flag for debugging
 verbose = False
+#verbose = True
 
 ################################################################
 # MTDevice class
