@@ -58,7 +58,7 @@ class XSensDriver(object):
 			return
 
 		rospy.loginfo("MT node interface: %s at %d bd."%(device, baudrate))
-		self.mt = mtdevice.MTDevice(device, baudrate)
+		self.mt = mtdevice.MTDevice(device, baudrate, timeout=0.5)
 		self.time = rospy.Time.now()
 		self.frame_id = get_param('~frame_id', '/mti/data')
 
@@ -182,7 +182,6 @@ class XSensDriver(object):
 		
 		if time_data:
 			time = time_data['SampleTimeFine']
-			print time
 			#secs = math.floor(100e-6*time)
 			#nsecs = 1e5*time - 1e9*math.floor(secs)
 			secs = time / 10000
