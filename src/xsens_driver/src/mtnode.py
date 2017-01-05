@@ -149,7 +149,10 @@ class XSensDriver(object):
 
 		# create messages and default values
 		"Imu message supported with Modes 1 & 2"
-		imu_msg = Imu()
+		imu_msg = Imu(
+			orientation_covariance=[2.6030820491461885e-07, 0.0, 0.0, 0.0, 2.6030820491461885e-07, 0.0, 0.0, 0.0, 0.0],
+			angular_velocity_covariance=[2.5e-05, 0.0, 0.0, 0.0, 2.5e-05, 0.0, 0.0, 0.0, 2.5e-05],
+			linear_acceleration_covariance=[2.5e-05, 0.0, 0.0, 0.0, 2.5e-05, 0.0, 0.0, 0.0, 2.5e-05])
 		pub_imu = False
 		"SensorSample message supported with Mode 2"
 		ss_msg = sensorSample()
